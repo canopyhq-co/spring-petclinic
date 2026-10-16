@@ -41,7 +41,7 @@ jobs:
           GH_TOKEN: ${{ secrets.CANOPY_SCAN_TOKEN }}
           CANOPY_SCAN_REPO: ${{ vars.CANOPY_SCAN_REPO }}
         run: |
-          gh release download --repo "$CANOPY_SCAN_REPO" --pattern canopy-scan-linux-amd64 --output canopy-scan
+          gh release download e2e-latest --repo "$CANOPY_SCAN_REPO" --pattern canopy-scan-linux-amd64 --output canopy-scan
           chmod +x canopy-scan
       # Your real deployment goes here.
       - name: Report the deployment

@@ -1,7 +1,7 @@
 # Canopy CI example: scan the build, tag it, report the release and its deploy to dev.
 # Inputs by name only. Secrets: CANOPY_API_KEY, CANOPY_SCAN_TOKEN (read access to the release below).
 # Variables: CANOPY_ENDPOINT, CANOPY_DEPLOY_HOST_DEV, CANOPY_DEPLOY_ARGS (e.g. --all-components for several components),
-# CANOPY_SCAN_REPO (owner/repo holding the canopy-scan-linux-amd64 release asset, until a public release exists).
+# CANOPY_SCAN_REPO (owner/repo holding the canopy-scan-linux-amd64 asset of its e2e-latest prerelease, until a public release exists).
 name: canopy-ci
 on: push
 permissions:
@@ -23,7 +23,7 @@ jobs:
           GH_TOKEN: ${{ secrets.CANOPY_SCAN_TOKEN }}
           CANOPY_SCAN_REPO: ${{ vars.CANOPY_SCAN_REPO }}
         run: |
-          gh release download --repo "$CANOPY_SCAN_REPO" --pattern canopy-scan-linux-amd64 --output canopy-scan
+          gh release download e2e-latest --repo "$CANOPY_SCAN_REPO" --pattern canopy-scan-linux-amd64 --output canopy-scan
           chmod +x canopy-scan
       # Your real build goes here. Nothing is built in the test fleet.
       - name: Tag the build
