@@ -1,5 +1,5 @@
 # Canopy deploy example: report a deployment of an existing tag to an environment. Reports nothing else.
-# Secrets: CANOPY_API_KEY, CANOPY_SCAN_TOKEN. Variables also: CANOPY_SCAN_REPO. Variables: CANOPY_ENDPOINT, CANOPY_DEPLOY_HOST_<DEV|QA|UAT|PROD>, CANOPY_DEPLOY_ARGS.
+# Secrets: CANOPY_API_KEY, CANOPY_SCAN_TOKEN. Variables also: CANOPY_SCAN_REPO. Variables: CANOPY_ENDPOINT, CANOPY_DEPLOY_HOST_<DEV|QA|UAT|PROD>, CANOPY_DEPLOY_PORT (default 8443), CANOPY_DEPLOY_ARGS.
 name: canopy-deploy
 on:
   workflow_dispatch:
@@ -50,5 +50,5 @@ jobs:
             dev) host="$HOST_DEV" ;; qa) host="$HOST_QA" ;; uat) host="$HOST_UAT" ;; prod) host="$HOST_PROD" ;;
           esac
           test -n "$host" || { echo "no host configured for $DEPLOY_ENV"; exit 1; }
-          ./canopy-scan deploy --target . ${{ vars.CANOPY_DEPLOY_ARGS }} --host "$host" \
+          ./canopy-scan deploy --target . ${{ vars.CANOPY_DEPLOY_ARGS }} --host "$host" --port "${{ vars.CANOPY_DEPLOY_PORT || '8443' }}" \
             --release-version "$DEPLOY_TAG" --status "$DEPLOY_STATUS" --push --endpoint "$CANOPY_ENDPOINT"

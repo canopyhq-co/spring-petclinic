@@ -1,6 +1,6 @@
 # Canopy CI example: scan the build, tag it, report the release and its deploy to dev.
 # Inputs by name only. Secrets: CANOPY_API_KEY, CANOPY_SCAN_TOKEN (read access to the release below).
-# Variables: CANOPY_ENDPOINT, CANOPY_DEPLOY_HOST_DEV, CANOPY_DEPLOY_ARGS (e.g. --all-components for several components),
+# Variables: CANOPY_ENDPOINT, CANOPY_DEPLOY_HOST_DEV, CANOPY_DEPLOY_PORT (default 8443), CANOPY_DEPLOY_ARGS (e.g. --all-components for several components),
 # CANOPY_SCAN_REPO (owner/repo holding the canopy-scan-linux-amd64 asset of its e2e-latest prerelease, until a public release exists).
 name: canopy-ci
 on: push
@@ -30,6 +30,8 @@ jobs:
         id: tag
         run: |
           tag="e2e-${GITHUB_RUN_NUMBER}"
+          # A re-run of the same run number would collide with the tag the first attempt made.
+          [ "${GITHUB_RUN_ATTEMPT}" = "1" ] || tag="${tag}.${GITHUB_RUN_ATTEMPT}"
           git tag "$tag"
           git push origin "$tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
@@ -39,6 +41,6 @@ jobs:
         if: vars.CANOPY_NEVER_DEPLOY != 'true'
         run: |
           ./canopy-scan deploy --target . ${{ vars.CANOPY_DEPLOY_ARGS }} \
-            --host "${{ vars.CANOPY_DEPLOY_HOST_DEV }}" \
+            --host "${{ vars.CANOPY_DEPLOY_HOST_DEV }}" --port "${{ vars.CANOPY_DEPLOY_PORT || '8443' }}" \
             --release-version "${{ steps.tag.outputs.tag }}" --status success \
             --push --endpoint "$CANOPY_ENDPOINT"
